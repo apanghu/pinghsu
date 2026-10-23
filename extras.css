@@ -279,8 +279,7 @@ pre:hover .code-copy-btn { opacity: 1; }
 /* ─── Reading time ──────────────────────────────────────────────────────── */
 
 .read-time {
-    font-size: 12px;
-    opacity: .75;
+    font-size: inherit;
 }
 
 /* ─── Mobile TOC drawer ─────────────────────────────────────────────────── */

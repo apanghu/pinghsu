@@ -85,6 +85,7 @@ $comments->alt(' comment-odd', ' comment-even');
             <?php $security = $this->widget('Widget_Security'); ?>
             <input type="hidden" name="_" value="<?php echo $security->getToken($this->request->getReferer())?>">
         </form>
+        <?php if (class_exists('reCAPTCHAv3_Plugin')) { reCAPTCHAv3_Plugin::output(); } ?>
         <?php else : ?>
             <span class="response">The article has been posted for too long and comments have been automatically closed.</span>
         <?php endif; ?>

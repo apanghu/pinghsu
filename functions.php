@@ -224,8 +224,8 @@ function getHotTags($obj, $limit){
         ->order('count', Typecho_Db::SORT_DESC)
         ->limit($limit));
     foreach($tags as $tag){
-        $tag = $obj->filter($tag);
-        $output = '<li><a href="'.$tag['permalink'].'"># '.$tag['name'].'</a></li>';
+        $permalink = \Typecho\Router::url('tag', $tag, \Widget\Options::alloc()->index);
+        $output = '<li><a href="'.$permalink.'"># '.$tag['name'].'</a></li>';
         echo $output;
     }
 }
@@ -249,10 +249,9 @@ function theNext($widget, $default = NULL){
         ->where('table.contents.password IS NULL')
         ->order('table.contents.created', Typecho_Db::SORT_ASC)
         ->limit(1);
-    $content = $db->fetchRow($sql);
-    if ($content) {
-        $content = $widget->filter($content);
-        $link = '<a href="'.$content['permalink'].'" title="'.$content['title'].'">←</a>';
+    $content = \Widget\Contents\From::allocWithAlias('next:' . $widget->cid, array('query' => $sql));
+    if ($content->have()) {
+        $link = '<a href="'.$content->permalink.'" title="'.$content->title.'">←</a>';
         echo $link;
     } else {
         echo $default;
@@ -268,10 +267,9 @@ function thePrev($widget, $default = NULL){
         ->where('table.contents.password IS NULL')
         ->order('table.contents.created', Typecho_Db::SORT_DESC)
         ->limit(1);
-    $content = $db->fetchRow($sql);
-    if ($content) {
-        $content = $widget->filter($content);
-        $link = '<a href="'.$content['permalink'].'" title="'.$content['title'].'">→</a>';
+    $content = \Widget\Contents\From::allocWithAlias('prev:' . $widget->cid, array('query' => $sql));
+    if ($content->have()) {
+        $link = '<a href="'.$content->permalink.'" title="'.$content->title.'">→</a>';
         echo $link;
     } else {
         echo $default;

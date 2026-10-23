@@ -80,10 +80,10 @@
 	<div class="bottom-bar-inner">
 		<div class="bottom-bar-items social-share left">
 			<span class="bottom-bar-item">Share : </span>
-			<span class="bottom-bar-item bottom-bar-facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($this->permalink()); ?>" target="_blank" title="<?php $this->title() ?>" rel="nofollow">Facebook</a></span>
-			<span class="bottom-bar-item bottom-bar-x"><a href="https://twitter.com/intent/tweet?url=<?php echo urlencode($this->permalink()); ?>&text=<?php echo urlencode($this->title()); ?>" target="_blank" title="<?php $this->title() ?>" rel="nofollow">X</a></span>
-			<span class="bottom-bar-item bottom-bar-weibo"><a href="http://service.weibo.com/share/share.php?url=<?php echo urlencode($this->permalink()); ?>&amp;title=<?php echo urlencode($this->title()); ?>" target="_blank" title="<?php $this->title() ?>" rel="nofollow">Weibo</a></span>
-			<span class="bottom-bar-item bottom-bar-qrcode"><a href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<?php echo urlencode($this->permalink()); ?>" target="_blank" rel="nofollow">QR code</a></span>
+			<span class="bottom-bar-item bottom-bar-facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($this->permalink); ?>" target="_blank" title="<?php $this->title() ?>" rel="nofollow">Facebook</a></span>
+			<span class="bottom-bar-item bottom-bar-x"><a href="https://twitter.com/intent/tweet?url=<?php echo urlencode($this->permalink); ?>&text=<?php echo urlencode($this->title); ?>" target="_blank" title="<?php $this->title() ?>" rel="nofollow">X</a></span>
+			<span class="bottom-bar-item bottom-bar-weibo"><a href="http://service.weibo.com/share/share.php?url=<?php echo urlencode($this->permalink); ?>&amp;title=<?php echo urlencode($this->title); ?>" target="_blank" title="<?php $this->title() ?>" rel="nofollow">Weibo</a></span>
+			<span class="bottom-bar-item bottom-bar-qrcode"><a href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<?php echo urlencode($this->permalink); ?>" target="_blank" rel="nofollow">QR code</a></span>
 		</div>
 		<div class="bottom-bar-items right">
 			<span class="bottom-bar-item"><?php theNext($this); ?></span>

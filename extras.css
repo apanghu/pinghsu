@@ -310,6 +310,14 @@ pre:hover .code-copy-btn { opacity: 1; }
     }
 }
 
+/* ─── Search page ──────────────────────────────────────────────────────── */
+
+.search-hint {
+    margin: 12px 0 6px;
+    font-size: 13px;
+    color: var(--ph-text, #767676);
+}
+
 /* ─── Search result highlight ───────────────────────────────────────────── */
 
 .item-title mark {

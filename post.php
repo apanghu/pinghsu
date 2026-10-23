@@ -21,7 +21,23 @@
 </div>
 <?php endif; ?>
 
-<article class="main-content <?php if ($this->options->postshowthumb == 'able'): ?>post-page<?php else: ?>page-page<?php endif; ?>" itemscope itemtype="https://schema.org/Article">
+<?php
+$jsonld = [
+    '@context' => 'https://schema.org',
+    '@type'    => 'Article',
+    'headline' => $this->title,
+    'datePublished' => date('c', $this->created),
+    'dateModified'  => date('c', $this->modified),
+    'author' => ['@type' => 'Person', 'name' => $this->author->screenName],
+    'publisher' => ['@type' => 'Organization', 'name' => $this->options->title],
+    'url' => $this->permalink,
+    'description' => $this->excerpt ?: mb_substr(strip_tags($this->content), 0, 160),
+];
+$thumb = postThumbUrl($this);
+if ($thumb) $jsonld['image'] = $thumb;
+?>
+<script type="application/ld+json"><?php echo json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?></script>
+<article class="main-content <?php if ($this->options->postshowthumb == 'able'): ?>post-page<?php else: ?>page-page<?php endif; ?>">
 	<div class="post-header">
 		<h1 class="post-title" itemprop="name headline">
 			<?php $this->title() ?>

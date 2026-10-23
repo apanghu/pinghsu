@@ -121,6 +121,30 @@ function themeConfig($form) {
 
     $ICPRecordNumber = new Typecho_Widget_Helper_Form_Element_Text('ICPRecordNumber', NULL, '', _t('ICP备案号'), _t('ICP备案号，一般为你备案申请审批通过后返回的认证序列号，也就是ICP备案号，一般为粤XXXXXXX'));
     $form->addInput($ICPRecordNumber->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
+
+    $darkMode = new Typecho_Widget_Helper_Form_Element_Radio('darkMode',
+        array('able' => _t('启用'), 'disable' => _t('禁止')),
+        'able', _t('深色模式开关'), _t('默认启用，在导航栏显示深色/浅色切换按钮，访客偏好通过 localStorage 保存'));
+    $form->addInput($darkMode);
+
+    $postExtras = new Typecho_Widget_Helper_Form_Element_Radio('postExtras',
+        array('able' => _t('启用'), 'disable' => _t('禁止')),
+        'able', _t('文章增强功能'), _t('默认启用：阅读进度条、字数/阅读时间估算、代码一键复制、移动端目录抽屉'));
+    $form->addInput($postExtras);
+
+    $gravatarMirror = new Typecho_Widget_Helper_Form_Element_Text('gravatarMirror', NULL, '', _t('Gravatar 镜像地址'), _t('留空使用 https://secure.gravatar.com，中国大陆可填镜像如 https://gravatar.loli.net'));
+    $form->addInput($gravatarMirror->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
+
+    $mathjaxUrl = new Typecho_Widget_Helper_Form_Element_Text('mathjaxUrl', NULL, '', _t('MathJax CDN 地址'), _t('留空使用 cdnjs 默认地址；中国大陆可改为国内 CDN，需包含 ?config=TeX-AMS-MML_HTMLorMML'));
+    $form->addInput($mathjaxUrl->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
+}
+
+function t($zh, $en = '') {
+    $lang = Typecho_Widget::widget('Widget_Options')->lang;
+    if ($lang && substr($lang, 0, 2) !== 'zh') {
+        return $en !== '' ? $en : $zh;
+    }
+    return $zh;
 }
 
 function themeInit($archive) {
@@ -314,7 +338,8 @@ function getHotTags($obj, $limit) {
         ->order('count', Typecho_Db::SORT_DESC)
         ->limit($limit));
     foreach ($tags as $tag) {
-        $permalink = \Typecho\Router::url('tag', $tag, \Widget\Options::alloc()->index);
+        $opts = Typecho_Widget::widget('Widget_Options');
+        $permalink = \Typecho\Router::url('tag', $tag, $opts->index);
         echo '<li><a href="' . htmlspecialchars($permalink, ENT_QUOTES, 'UTF-8') . '"># '
             . htmlspecialchars($tag['name'], ENT_QUOTES, 'UTF-8') . '</a></li>';
     }

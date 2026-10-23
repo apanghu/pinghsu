@@ -37,13 +37,13 @@ $comments->alt(' comment-odd', ' comment-even');
 ?>">
     <div id="<?php $comments->theId(); ?>">
         <?php
-            $host = 'https://secure.gravatar.com';
-            $url = '/avatar/';
+            $opts = Helper::options();
+            $host = !empty($opts->gravatarMirror) ? rtrim($opts->gravatarMirror, '/') : 'https://secure.gravatar.com';
             $size = '80';
             $default = 'mm';
-            $rating = Helper::options()->commentsAvatarRating;
+            $rating = $opts->commentsAvatarRating;
             $hash = md5(strtolower($comments->mail));
-            $avatar = $host . $url . $hash . '?s=' . $size . '&r=' . $rating . '&d=' . $default;
+            $avatar = $host . '/avatar/' . $hash . '?s=' . $size . '&r=' . $rating . '&d=' . $default;
         ?>
         <div class="comment-view" onclick="">
             <div class="comment-header">

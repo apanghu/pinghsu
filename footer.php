@@ -222,10 +222,14 @@ MathJax.Hub.Config({
 });
 MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" crossorigin="anonymous"></script>
+<?php $mjUrl = !empty($this->options->mathjaxUrl) ? htmlspecialchars($this->options->mathjaxUrl, ENT_QUOTES, 'UTF-8') : 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML'; ?>
+<script src="<?php echo $mjUrl; ?>" crossorigin="anonymous"></script>
 <?php endif; ?>
 <?php if($this->options->GoogleAnalytics): ?>
 <?php $this->options->GoogleAnalytics(); ?>
+<?php endif; ?>
+<?php if ($this->options->postExtras == 'able'): ?>
+<script src="<?php $this->options->themeUrl('extras.js'); ?>?v=<?php echo filemtime(__DIR__ . '/extras.js'); ?>"></script>
 <?php endif; ?>
 <?php if ($this->options->pjaxSet == 'able'): ?>
 <script data-no-instant>

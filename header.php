@@ -23,8 +23,12 @@
     <meta name="keywords" content="<?php $this->keywords(); ?>">
     <?php $this->header('keywords=&generator=&template=&pingback=&xmlrpc=&wlw=&commentReply=&rss1=&rss2=&atom='); ?>
     <link href="<?php $this->options->themeUrl('vendor/xcode.min.css'); ?>?v=<?php echo filemtime(__DIR__ . '/vendor/xcode.min.css'); ?>" rel="stylesheet">
+    <?php if ($this->options->useHighline == 'able'): ?>
+    <link id="hljs-dark-theme" href="<?php $this->options->themeUrl('vendor/atom-one-dark.min.css'); ?>?v=<?php echo filemtime(__DIR__ . '/vendor/atom-one-dark.min.css'); ?>" rel="stylesheet" media="not all">
+    <?php endif; ?>
     <link href="<?php $this->options->themeUrl('style.min.css'); ?>?v=<?php echo filemtime(__DIR__ . '/style.min.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('extras.css'); ?>?v=<?php echo filemtime(__DIR__ . '/extras.css'); ?>" rel="stylesheet">
+    <script>(function(){var s=null;try{s=localStorage.getItem('ph-theme');}catch(e){}if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}var el=document.getElementById('hljs-dark-theme');if(el){var d=s==='dark'||(s!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);el.media=d?'all':'not all';}}());</script>
 </head>
 <body class="<?php if (isset($this->fields->archive)): ?>bg-grey<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'defaultColor')): ?>bg-grey<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'customColor')): ?>bg-white<?php elseif(!$this->is('single')): ?>bg-grey<?php endif; ?>">
 <a class="skip-link sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
@@ -65,6 +69,9 @@
             </form>
         </div>
         <?php endif;?>
+        <?php if ($this->options->darkMode == 'able'): ?>
+        <button id="dm-toggle" type="button" aria-label="切换为深色模式" title="深色"><span class="dm-icon" aria-hidden="true">🌙</span></button>
+        <?php endif; ?>
         <nav class="navbar-mobile-menu" aria-label="移动端导航">
             <span class="icon-menu cross" aria-hidden="true"><span class="middle"></span></span>
             <ul>

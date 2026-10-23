@@ -44,7 +44,7 @@
             </div>
             <div class="meta-item meta-posts">
                 <h3 class="meta-title">RECENT POSTS</h3>
-                <?php getRecentPosts($this, 8); ?>
+                <?php getRecentPosts($this, 5); ?>
             </div>
             <div class="meta-item meta-tags">
                 <h3 class="meta-title">HOT TAGS</h3>

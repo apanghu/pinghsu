@@ -15,9 +15,9 @@ function threadedComments($comments, $options) {
     $depth = $comments->levels +1;
 
     if ($comments->url) {
-        $author = '<a href="' . $comments->url . '"target="_blank"' . ' rel="external nofollow">' . $comments->author . '</a>';
+        $author = '<a href="' . htmlspecialchars($comments->url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="external nofollow noopener">' . htmlspecialchars($comments->author, ENT_QUOTES, 'UTF-8') . '</a>';
     } else {
-        $author = $comments->author;
+        $author = htmlspecialchars($comments->author, ENT_QUOTES, 'UTF-8');
     }
 ?>
 
@@ -51,7 +51,7 @@ $comments->alt(' comment-odd', ' comment-even');
                 <span class="comment-author<?php echo $commentClass; ?>"><?php echo $author; ?></span>
             </div>
             <div class="comment-content">
-                <span class="comment-author-at"><?php getCommentAt($comments->coid); ?></span> <?php $comments->content(); ?></p>
+                <span class="comment-author-at"><?php getCommentAt($comments->coid); ?></span> <?php $comments->content(); ?>
             </div>
             <div class="comment-meta">
                 <time class="comment-time"><?php $comments->date('M j, Y'); ?></time>
@@ -74,7 +74,7 @@ $comments->alt(' comment-odd', ' comment-even');
         <span class="response">Responses<?php if($this->user->hasLogin()): ?> / You are <a href="<?php $this->options->profileUrl(); ?>" data-no-instant><?php $this->user->screenName(); ?></a> here, do you want to <a href="<?php $this->options->logoutUrl(); ?>" title="Logout" data-no-instant>logout</a> ?<?php endif; ?> <?php $comments->cancelReply(' / Cancel Reply'); ?></span>
         <form method="post" action="<?php $this->commentUrl() ?>" id="comment-form" class="comment-form" role="form" onsubmit ="getElementById('misubmit').disabled=true;return true;">
             <?php if(!$this->user->hasLogin()): ?>
-            <input type="text" name="author" maxlength="12" id="author" class="form-control input-control clearfix" placeholder="Name (*)" value="" required>
+            <input type="text" name="author" maxlength="200" id="author" class="form-control input-control clearfix" placeholder="Name (*)" value="" required>
             <input type="email" name="mail" id="mail" class="form-control input-control clearfix" placeholder="Email (*)" value="" <?php if ($this->options->commentsRequireMail): ?> required<?php endif; ?>>
             <input type="url" name="url" id="url" class="form-control input-control clearfix" placeholder="Site (https://)" value="" <?php if ($this->options->commentsRequireURL): ?> required<?php endif; ?>>
             <?php endif; ?>

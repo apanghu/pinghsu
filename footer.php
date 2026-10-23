@@ -1,21 +1,21 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 
-<footer id="footer" class="footer <?php if (isset($this->___fields()['archive'])): ?>bg-white<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'defaultColor')): ?>bg-white<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'customColor')): ?>bg-grey<?php elseif($this->is('single')): ?>bg-white<?php endif; ?>">
+<footer id="footer" class="footer <?php if (isset($this->fields->archive)): ?>bg-white<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'defaultColor')): ?>bg-white<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'customColor')): ?>bg-grey<?php elseif($this->is('single')): ?>bg-white<?php endif; ?>">
     <div class="footer-social">
         <div class="footer-container clearfix">
             <div class="social-list">
             <?php if ($this->options->socialweibo): ?>
-                <a class="social weibo" target="blank" href="<?php $this->options->socialweibo(); ?>">WEIBO</a>
+                <a class="social weibo" target="_blank" rel="noopener" href="<?php $this->options->socialweibo(); ?>">WEIBO</a>
             <?php endif; ?>
             <?php if ($this->options->socialzhihu): ?>
-                <a class="social zhihu" target="blank" href="<?php $this->options->socialzhihu(); ?>">ZHIHU</a>
+                <a class="social zhihu" target="_blank" rel="noopener" href="<?php $this->options->socialzhihu(); ?>">ZHIHU</a>
             <?php endif; ?>
-                <a class="social rss" target="blank" href="<?php $this->options->siteUrl(); ?>feed/">RSS</a>
+                <a class="social rss" target="_blank" rel="noopener" href="<?php $this->options->feedUrl(); ?>">RSS</a>
             <?php if ($this->options->socialgithub): ?>
-                <a class="social github" target="blank" href="<?php $this->options->socialgithub(); ?>">GITHUB</a>
+                <a class="social github" target="_blank" rel="noopener" href="<?php $this->options->socialgithub(); ?>">GITHUB</a>
             <?php endif; ?>
             <?php if ($this->options->socialtwitter): ?>
-                <a class="social twitter" target="blank" href="<?php $this->options->socialtwitter(); ?>">TWITTER</a>
+                <a class="social twitter" target="_blank" rel="noopener" href="<?php $this->options->socialtwitter(); ?>">TWITTER</a>
             <?php endif; ?>
             </div>
         </div>
@@ -32,9 +32,9 @@
                         <?php endif; ?>
                     </a>
                     <div class="info-text">
-                        <p>Theme is <a href="https://github.com/chakhsu/pinghsu" target="blank">Pinghsu</a> by <a href="https://www.linpx.com/" target="_blank">Chakhsu</a></p>
+                        <p>Theme is <a href="https://github.com/chakhsu/pinghsu" target="_blank" rel="noopener">Pinghsu</a> by <a href="https://www.linpx.com/" target="_blank" rel="noopener">Chakhsu</a></p>
                         <?php if ($this->options->ICPRecordNumber): ?>
-                        <p><a href="https://beian.miit.gov.cn/" target="blank" ><?php $this->options->ICPRecordNumber(); ?></a></p>
+                        <p><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener"><?php $this->options->ICPRecordNumber(); ?></a></p>
                         <?php endif; ?>
                         <p>&copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a></p>
                     </div>
@@ -42,11 +42,12 @@
             </div>
             <div class="meta-item meta-posts">
                 <h3 class="meta-title">RECENT POSTS</h3>
-                <?php getRecentPosts($this,8); ?>
+                <?php getRecentPosts($this, 8); ?>
             </div>
             <div class="meta-item meta-tags">
                 <h3 class="meta-title">HOT TAGS</h3>
-                <?php getHotTags($this,20); ?>
+                <?php getHotTags($this, 20); ?>
+            </div>
         </div>
     </div>
 </footer>
@@ -119,17 +120,18 @@
 })();
 <?php if(!$this->user->hasLogin()): ?>
 function getCommentCookie(name){
-    var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
-    if (arr=document.cookie.match(reg)) {
-        return unescape(decodeURI(arr[2]));
+    var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+    if (arr = document.cookie.match(reg)) {
+        return decodeURIComponent(arr[2]);
     } else {
         return null;
     }
 }
 function addCommentInputValue(){
-    document.getElementById('author').value = getCommentCookie('<?php echo md5($this->request->getUrlPrefix()); ?>__typecho_remember_author');
-    document.getElementById('mail').value = getCommentCookie('<?php echo md5($this->request->getUrlPrefix()); ?>__typecho_remember_mail');
-    document.getElementById('url').value = getCommentCookie('<?php echo md5($this->request->getUrlPrefix()); ?>__typecho_remember_url');
+    var prefix = '<?php echo \Typecho\Cookie::getPrefix(); ?>';
+    document.getElementById('author').value = getCommentCookie(prefix + '__typecho_remember_author') || '';
+    document.getElementById('mail').value   = getCommentCookie(prefix + '__typecho_remember_mail')   || '';
+    document.getElementById('url').value    = getCommentCookie(prefix + '__typecho_remember_url')    || '';
 }
 addCommentInputValue();
 <?php endif; ?>
@@ -235,7 +237,7 @@ InstantClick.on('change', function(isInitialLoad){
     <?php if ($this->options->useHighline == 'able'): ?>
     var blocks = document.querySelectorAll('pre code');
     for (var i = 0; i < blocks.length; i++) {
-        hljs.highlightBlock(blocks[i]);
+        hljs.highlightElement(blocks[i]);
     }
     <?php endif; ?>
 

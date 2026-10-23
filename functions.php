@@ -18,7 +18,7 @@ function themeConfig($form) {
         array('able' => _t('启用'),
             'disable' => _t('禁止'),
         ),
-        'disable', _t('PJAX加速设置'), _t('默认禁止，若启用则需提前到关闭‘开启反垃圾保护’,开关在‘设置-评论’'));
+        'disable', _t('PJAX加速设置'), _t('默认禁止，若启用则需提前到关闭\'开启反垃圾保护\',开关在\'设置-评论\''));
     $form->addInput($pjaxSet);
 
     $DnsPrefetch = new Typecho_Widget_Helper_Form_Element_Radio('DnsPrefetch',
@@ -116,132 +116,224 @@ function themeConfig($form) {
     $form->addInput($srcAddress->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
     $cdnAddress = new Typecho_Widget_Helper_Form_Element_Text('cdn_add', NULL, NULL, _t('图片CDN替换后地址'), _t('即你的七牛云存储域名，一般为http://yourblog.qiniudn.com/，可能也支持其他有镜像功能的CDN服务'));
     $form->addInput($cdnAddress->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
-    $default_thumb = new Typecho_Widget_Helper_Form_Element_Text('default_thumb', NULL, '', _t('默认缩略图'),_t('文章没有图片时的默认缩略图，留空则无，一般为http://www.yourblog.com/image.png'));
+    $default_thumb = new Typecho_Widget_Helper_Form_Element_Text('default_thumb', NULL, '', _t('默认缩略图'), _t('文章没有图片时的默认缩略图，留空则无，一般为http://www.yourblog.com/image.png'));
     $form->addInput($default_thumb->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
 
-    $ICPRecordNumber = new Typecho_Widget_Helper_Form_Element_Text('ICPRecordNumber', NULL, '', _t('ICP备案号'),_t('ICP备案号，一般为你备案申请审批通过后返回的认证序列号，也就是ICP备案号，一般为粤XXXXXXX'));
+    $ICPRecordNumber = new Typecho_Widget_Helper_Form_Element_Text('ICPRecordNumber', NULL, '', _t('ICP备案号'), _t('ICP备案号，一般为你备案申请审批通过后返回的认证序列号，也就是ICP备案号，一般为粤XXXXXXX'));
     $form->addInput($ICPRecordNumber->addRule('xssCheck', _t('请不要在链接中使用特殊字符')));
 }
 
-function themeInit($archive){
+function themeInit($archive) {
     Helper::options()->commentsMaxNestingLevels = 999;
     if ($archive->is('archive')) {
         $archive->parameter->pageSize = 12;
     }
 }
 
-function showThumb($obj,$size=null,$link=false){
-    preg_match_all( "/<[img|IMG].*?src=[\'|\"](.*?)[\'|\"].*?[\/]?>/", $obj->content, $matches );
-    $thumb = '';
+/**
+ * Return the background CSS class for a post card or header.
+ * Uses custom-field color when colorBgPosts=customColor, a deterministic
+ * fallback derived from the post cid, or bg-deepgrey for defaultColor.
+ */
+function postBgClass($obj) {
+    $opts = Typecho_Widget::widget('Widget_Options');
+    if ($opts->colorBgPosts === 'defaultColor') {
+        return 'bg-deepgrey';
+    }
+    if ($opts->colorBgPosts === 'customColor') {
+        $fields = $obj->fields;
+        foreach (['green', 'red', 'yellow', 'blue', 'purple'] as $c) {
+            if (isset($fields->$c)) return 'bg-' . $c;
+        }
+        $colors = ['blue', 'purple', 'green', 'yellow', 'red', 'orange'];
+        return 'bg-' . $colors[abs((int)$obj->cid % 6)];
+    }
+    return '';
+}
+
+/**
+ * Return the icon CSS class (bg-ico-*) for a post, taken from the first
+ * matching custom field or derived deterministically from the post cid.
+ */
+function postIcoClass($obj) {
+    $fields = $obj->fields;
+    $icons  = ['book', 'game', 'note', 'chat', 'code', 'image', 'web', 'link', 'design', 'lock'];
+    foreach ($icons as $ico) {
+        if (isset($fields->$ico)) return 'bg-ico-' . $ico;
+    }
+    return 'bg-ico-' . $icons[abs((int)$obj->cid % 10)];
+}
+
+/**
+ * Return the thumbnail URL for a post.  Resolution order:
+ *   1. Custom field `thumb`
+ *   2. First attached image
+ *   3. First <img> or Markdown image in the raw post text
+ *   4. Configured default_thumb option
+ *   5. Deterministic fallback from the bundled thumbs sprite (cid % 10)
+ * CDN substitution (src_add / cdn_add) is applied when configured.
+ */
+function postThumbUrl($obj) {
     $options = Typecho_Widget::widget('Widget_Options');
-    $attach = $obj->attachments(1)->attachment;
-    if (isset($attach->isImage) && $attach->isImage == 1){
-        $thumb = $attach->url;
-        if(!empty($options->src_add) && !empty($options->cdn_add)){
-            $thumb = str_ireplace($options->src_add,$options->cdn_add,$thumb);
-        }
-    }elseif(isset($matches[1][0])){
-        $thumb = $matches[1][0];
-        if(!empty($options->src_add) && !empty($options->cdn_add)){
-            $thumb = str_ireplace($options->src_add,$options->cdn_add,$thumb);
+    $thumb   = '';
+
+    if (isset($obj->fields->thumb)) {
+        $thumb = (string)$obj->fields->thumb;
+    }
+
+    if ($thumb === '') {
+        $attach = $obj->attachments(1)->attachment;
+        if (isset($attach->isImage) && $attach->isImage == 1) {
+            $thumb = $attach->url;
         }
     }
-    if(empty($thumb) && empty($options->default_thumb)){
-        return '';
-    }else{
-        $thumb = empty($thumb) ? $options->default_thumb : $thumb;
+
+    if ($thumb === '') {
+        if (preg_match('/<img\b[^>]*\bsrc=[\'"]([^\'"]+)[\'"]/i', $obj->text, $m)) {
+            $thumb = $m[1];
+        } elseif (preg_match('/!\[[^\]]*\]\(([^)\s]+)\)/', $obj->text, $m)) {
+            $thumb = $m[1];
+        }
     }
-    if($link){
+
+    if ($thumb === '') {
+        $thumb = !empty($options->default_thumb)
+            ? $options->default_thumb
+            : $options->themeUrl . '/images/thumbs/' . (abs((int)$obj->cid % 10)) . '.jpg';
+    }
+
+    if (!empty($options->src_add) && !empty($options->cdn_add)) {
+        $thumb = str_ireplace($options->src_add, $options->cdn_add, $thumb);
+    }
+
+    return $thumb;
+}
+
+/** @deprecated Use postThumbUrl() */
+function showThumb($obj, $size = null, $link = false) {
+    if (!$link) return null;
+    // Return the real thumb URL or empty string (no deterministic fallback).
+    $options = Typecho_Widget::widget('Widget_Options');
+
+    if (isset($obj->fields->thumb)) {
+        $thumb = (string)$obj->fields->thumb;
+        if (!empty($options->src_add) && !empty($options->cdn_add)) {
+            $thumb = str_ireplace($options->src_add, $options->cdn_add, $thumb);
+        }
         return $thumb;
     }
+
+    $attach = $obj->attachments(1)->attachment;
+    if (isset($attach->isImage) && $attach->isImage == 1) {
+        $thumb = $attach->url;
+        if (!empty($options->src_add) && !empty($options->cdn_add)) {
+            $thumb = str_ireplace($options->src_add, $options->cdn_add, $thumb);
+        }
+        return $thumb;
+    }
+
+    if (preg_match('/<img\b[^>]*\bsrc=[\'"]([^\'"]+)[\'"]/i', $obj->text, $m)) {
+        return $m[1];
+    }
+    if (preg_match('/!\[[^\]]*\]\(([^)\s]+)\)/', $obj->text, $m)) {
+        return $m[1];
+    }
+
+    if (!empty($options->default_thumb)) {
+        return $options->default_thumb;
+    }
+
+    return '';
 }
 
-function parseFieldsThumb($obj){
+function parseFieldsThumb($obj) {
     $options = Typecho_Widget::widget('Widget_Options');
-    if(!empty($options->src_add) && !empty($options->cdn_add)){
-        $fieldsThumb = str_ireplace($options->src_add,$options->cdn_add,$obj->fields->thumb);
-        echo trim($fieldsThumb);
-    }else{
-        return $obj->fields->thumb();
+    $thumb   = (string)$obj->fields->thumb;
+    if (!empty($options->src_add) && !empty($options->cdn_add)) {
+        $thumb = str_ireplace($options->src_add, $options->cdn_add, $thumb);
     }
+    echo htmlspecialchars(trim($thumb), ENT_QUOTES, 'UTF-8');
 }
 
-function parseContent($obj){
+function parseContent($obj) {
     $options = Typecho_Widget::widget('Widget_Options');
-    if(!empty($options->src_add) && !empty($options->cdn_add)){
-        $obj->content = str_ireplace($options->src_add,$options->cdn_add,$obj->content);
+    $content = $obj->content;
+    if (!empty($options->src_add) && !empty($options->cdn_add)) {
+        $content = str_ireplace($options->src_add, $options->cdn_add, $content);
     }
-    $obj->content = preg_replace("/<a href=\"([^\"]*)\">/i", "<a href=\"\\1\" target=\"_blank\">", $obj->content);
-    $obj->content = preg_replace('/<img(.*?)src(.*?)=(.*?)"(.*?)">/i', '<img$1src$3="$4"$5 loading="lazy">', $obj->content);
-    $obj->content = preg_replace_callback('/<h([1-5])>(.*?)<\/h\1>/i', function($matches) {
+    $content = preg_replace('/<a href="([^"]*)">/i', '<a href="$1" target="_blank" rel="noopener noreferrer">', $content);
+    $content = preg_replace('/<img(.*?)src(.*?)=(.*?)"(.*?)">/i', '<img$1src$3="$4"$5 loading="lazy">', $content);
+    $content = preg_replace_callback('/<h([1-5])>(.*?)<\/h\1>/i', function ($matches) {
         static $id = 1;
-        $hyphenated = 'anchor-' . $id;
-        $id++;
+        $hyphenated = 'anchor-' . $id++;
         return '<h' . $matches[1] . ' id="' . $hyphenated . '">' . $matches[2] . '</h' . $matches[1] . '>';
-    }, $obj->content);
-
-    echo trim($obj->content);
+    }, $content);
+    echo trim($content);
 }
 
-function getCommentAt($coid){
-    $db   = Typecho_Db::get();
-    $prow = $db->fetchRow($db->select('parent')
-        ->from('table.comments')
-        ->where('coid = ? AND status = ?', $coid, 'approved'));
-    $parent = $prow['parent'];
-    if ($parent != "0") {
-        $arow = $db->fetchRow($db->select('author')
+/**
+ * Echo the @Author reply-to link for a comment.
+ * Uses a static cache to avoid two SQL queries per comment on threaded pages.
+ */
+function getCommentAt($coid) {
+    static $cache = [];
+    if (!array_key_exists($coid, $cache)) {
+        $db   = Typecho_Db::get();
+        $prow = $db->fetchRow($db->select('parent')
             ->from('table.comments')
-            ->where('coid = ? AND status = ?', $parent, 'approved'));
-        $author = $arow['author'];
-        $href   = '<a href="#comment-'.$parent.'">@'.$author.'</a>';
-        echo $href;
-    } else {
-        echo '';
+            ->where('coid = ? AND status = ?', $coid, 'approved'));
+        $parent = $prow ? (int)$prow['parent'] : 0;
+        if ($parent > 0) {
+            $arow   = $db->fetchRow($db->select('author')
+                ->from('table.comments')
+                ->where('coid = ? AND status = ?', $parent, 'approved'));
+            $author = $arow ? $arow['author'] : '';
+            $cache[$coid] = $author
+                ? '<a href="#comment-' . $parent . '">@' . htmlspecialchars($author, ENT_QUOTES, 'UTF-8') . '</a>'
+                : '';
+        } else {
+            $cache[$coid] = '';
+        }
+    }
+    echo $cache[$coid];
+}
+
+function getRecentPosts($obj, $pageSize) {
+    $obj->widget('Widget_Contents_Post_Recent', 'pageSize=' . (int)$pageSize)->to($recent);
+    while ($recent->next()) {
+        echo '<li><a href="' . htmlspecialchars($recent->permalink, ENT_QUOTES, 'UTF-8') . '">'
+            . htmlspecialchars($recent->title, ENT_QUOTES, 'UTF-8') . '</a></li>';
     }
 }
 
-function getRecentPosts($obj,$pageSize){
-    $db = Typecho_Db::get();
-    $rows = $db->fetchAll($db->select('cid')
-       ->from('table.contents')
-       ->where('type = ? AND status = ?', 'post', 'publish')
-       ->order('created', Typecho_Db::SORT_DESC)
-       ->limit($pageSize));
-    foreach($rows as $row){
-        $cid = $row['cid'];
-        $apost = $obj->widget('Widget_Archive@post_'.$cid, 'type=post', 'cid='.$cid);
-        $output = '<li><a href="'.$apost->permalink.'">'.$apost->title.'</a></li>';
-        echo $output;
-    }
-}
-
-function getHotTags($obj, $limit){
-    $db = Typecho_Db::get();
+function getHotTags($obj, $limit) {
+    $db   = Typecho_Db::get();
     $tags = $db->fetchAll($db->select()
         ->from('table.metas')
         ->where('type = ?', 'tag')
         ->order('count', Typecho_Db::SORT_DESC)
         ->limit($limit));
-    foreach($tags as $tag){
+    foreach ($tags as $tag) {
         $permalink = \Typecho\Router::url('tag', $tag, \Widget\Options::alloc()->index);
-        $output = '<li><a href="'.$permalink.'"># '.$tag['name'].'</a></li>';
-        echo $output;
+        echo '<li><a href="' . htmlspecialchars($permalink, ENT_QUOTES, 'UTF-8') . '"># '
+            . htmlspecialchars($tag['name'], ENT_QUOTES, 'UTF-8') . '</a></li>';
     }
 }
 
-function randBgIco(){
-    $bgIco=array('book','game','note','chat','code','image','web','link','design','lock');
-    return $bgIco[mt_rand(0,9)];
+/** @deprecated Use postBgClass() for deterministic colors */
+function randBgColor() {
+    $colors = ['blue', 'purple', 'green', 'yellow', 'red', 'orange'];
+    return $colors[mt_rand(0, 5)];
 }
 
-function randBgColor(){
-    $bgColor=array('blue','purple','green','yellow','red','orange');
-    return $bgColor[mt_rand(0,5)];
+/** @deprecated Use postIcoClass() for deterministic icons */
+function randBgIco() {
+    $icons = ['book', 'game', 'note', 'chat', 'code', 'image', 'web', 'link', 'design', 'lock'];
+    return $icons[mt_rand(0, 9)];
 }
 
-function theNext($widget, $default = NULL){
-    $db = Typecho_Db::get();
+function theNext($widget, $default = null) {
+    $db  = Typecho_Db::get();
     $sql = $db->select()->from('table.contents')
         ->where('table.contents.created > ?', $widget->created)
         ->where('table.contents.status = ?', 'publish')
@@ -249,17 +341,17 @@ function theNext($widget, $default = NULL){
         ->where('table.contents.password IS NULL')
         ->order('table.contents.created', Typecho_Db::SORT_ASC)
         ->limit(1);
-    $content = \Widget\Contents\From::allocWithAlias('next:' . $widget->cid, array('query' => $sql));
+    $content = \Widget\Contents\From::allocWithAlias('next:' . $widget->cid, ['query' => $sql]);
     if ($content->have()) {
-        $link = '<a href="'.$content->permalink.'" title="'.$content->title.'">←</a>';
-        echo $link;
+        echo '<a href="' . htmlspecialchars($content->permalink, ENT_QUOTES, 'UTF-8')
+            . '" title="' . htmlspecialchars($content->title, ENT_QUOTES, 'UTF-8') . '">←</a>';
     } else {
         echo $default;
     }
 }
 
-function thePrev($widget, $default = NULL){
-    $db = Typecho_Db::get();
+function thePrev($widget, $default = null) {
+    $db  = Typecho_Db::get();
     $sql = $db->select()->from('table.contents')
         ->where('table.contents.created < ?', $widget->created)
         ->where('table.contents.status = ?', 'publish')
@@ -267,10 +359,10 @@ function thePrev($widget, $default = NULL){
         ->where('table.contents.password IS NULL')
         ->order('table.contents.created', Typecho_Db::SORT_DESC)
         ->limit(1);
-    $content = \Widget\Contents\From::allocWithAlias('prev:' . $widget->cid, array('query' => $sql));
+    $content = \Widget\Contents\From::allocWithAlias('prev:' . $widget->cid, ['query' => $sql]);
     if ($content->have()) {
-        $link = '<a href="'.$content->permalink.'" title="'.$content->title.'">→</a>';
-        echo $link;
+        echo '<a href="' . htmlspecialchars($content->permalink, ENT_QUOTES, 'UTF-8')
+            . '" title="' . htmlspecialchars($content->title, ENT_QUOTES, 'UTF-8') . '">→</a>';
     } else {
         echo $default;
     }

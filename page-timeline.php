@@ -16,15 +16,15 @@ $this->need('header.php');
     $output = '<div class="categories-item">';
     while($archives->next()){
         $year_tmp = date('Y',$archives->created);
-        $y=$year; 
+        $y=$year;
         if ($year > $year_tmp) {
             $output .= '</div></div>';
         }
         if ($year != $year_tmp) {
 			 $year = $year_tmp;
-			 $output .= '<a href="'.$this->options->siteUrl.''.date('Y',$archives->created).'"><div class="categories-title">'.date('Y',$archives->created).'</div></a><div class="post-lists"><div class="post-lists-body">';
+			 $output .= '<a href="' . htmlspecialchars($this->options->siteUrl . date('Y', $archives->created), ENT_QUOTES, 'UTF-8') . '"><div class="categories-title">' . date('Y', $archives->created) . '</div></a><div class="post-lists"><div class="post-lists-body">';
         }
-        $output .= '<div class="post-list-item"><div class="post-list-item-container"><div class="item-label"><div class="item-title"><a href="'.$archives->permalink .'">'. $archives->title .'</a></div><div class="item-meta clearfix"><div class="item-meta-date"> '.date('M j, Y',$archives->created).' </div></div></div></div></div>';
+        $output .= '<div class="post-list-item"><div class="post-list-item-container"><div class="item-label"><div class="item-title"><a href="' . htmlspecialchars($archives->permalink, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($archives->title, ENT_QUOTES, 'UTF-8') . '</a></div><div class="item-meta clearfix"><div class="item-meta-date"> ' . date('M j, Y', $archives->created) . ' </div></div></div></div></div>';
     }
     $output .= '</div></div></div>';
     echo $output;

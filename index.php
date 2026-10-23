@@ -20,10 +20,12 @@ $this->need('header.php');
 			<?php if ($this->options->postListSwitch == 'threeList'): ?>
 			<div class="post-list-item">
 				<div class="post-list-item-container">
-					<div class="item-thumb <?php echo $bgClass; ?>" style="background-image:url(<?php echo htmlspecialchars(postThumbUrl($this), ENT_QUOTES, 'UTF-8'); ?>);"></div>
+					<a href="<?php $this->permalink() ?>" class="item-thumb-link" aria-hidden="true" tabindex="-1">
+						<div class="item-thumb <?php echo $bgClass; ?>" style="background-image:url(<?php echo htmlspecialchars(postThumbUrl($this), ENT_QUOTES, 'UTF-8'); ?>);"></div>
+					</a>
 					<a href="<?php $this->permalink() ?>">
 	                	<div class="item-desc">
-							<p><?php $this->excerpt(75, '...');?></p>
+							<p><?php $this->excerpt(80, '...');?></p>
 						</div>
 					</a>
 					<div class="item-slant reverse-slant <?php echo $bgClass; ?>"></div>
@@ -31,7 +33,7 @@ $this->need('header.php');
 					<div class="item-label">
 						<div class="item-title"><a href="<?php $this->permalink(); ?>"><?php $this->title(); ?></a></div>
 						<div class="item-meta clearfix">
-							<div class="item-meta-date"><time datetime="<?php $this->date('c'); ?>" itemprop="datePublished"><?php $this->date('M j, Y'); ?></time></div>
+							<div class="item-meta-date"><time datetime="<?php $this->date('c'); ?>"><?php $this->date('Y/m/d'); ?></time></div>
 							<div class="item-meta-ico <?php echo postIcoClass($this); ?>" style="background: url(<?php $this->options->themeUrl('images/bg-ico.png'); ?>) no-repeat;background-size: 40px auto;"></div>
 							<div class="item-meta-cat"><?php $this->category(''); ?></div>
 						</div>

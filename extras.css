@@ -82,6 +82,60 @@
     }
 }
 
+/* ─── Homepage card polish ──────────────────────────────────────────────── */
+
+/* Lift + shadow on hover */
+.post-list-item-container {
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
+    will-change: transform;
+}
+.post-list-item-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13);
+}
+
+/* Thumb zoom on hover */
+.item-thumb {
+    transition: transform .45s ease;
+}
+.post-list-item-container:hover .item-thumb {
+    transform: scale(1.06);
+}
+
+/* Title hover colour */
+.item-label .item-title a {
+    transition: color .15s;
+}
+.item-label .item-title a:hover {
+    color: var(--ph-accent, #eb5055);
+}
+
+/* Meta: tabular date, tighten line */
+.item-meta-date time {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
+}
+
+/* Pagination: subtle style lift */
+.lists-navigator {
+    text-align: center;
+    margin: 24px 0 16px;
+}
+.lists-navigator a,
+.lists-navigator span {
+    display: inline-block;
+    padding: 6px 14px;
+    margin: 0 3px;
+    border-radius: 4px;
+    transition: background .15s, color .15s;
+}
+.lists-navigator a:hover {
+    background: var(--ph-accent, #eb5055);
+    color: #fff;
+}
+
 /* ─── Dark mode ─────────────────────────────────────────────────────────── */
 
 /* Light theme tokens (defaults) */

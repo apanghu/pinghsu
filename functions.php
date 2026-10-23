@@ -323,7 +323,10 @@ function getCommentAt($coid) {
 }
 
 function getRecentPosts($obj, $pageSize) {
-    $obj->widget('Widget_Contents_Post_Recent', 'pageSize=' . (int)$pageSize)->to($recent);
+    \Widget\Contents\Post\Recent::allocWithAlias(
+        'footer_recent',
+        'pageSize=' . (int)$pageSize
+    )->to($recent);
     while ($recent->next()) {
         echo '<li><a href="' . htmlspecialchars($recent->permalink, ENT_QUOTES, 'UTF-8') . '">'
             . htmlspecialchars($recent->title, ENT_QUOTES, 'UTF-8') . '</a></li>';

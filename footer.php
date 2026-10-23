@@ -173,16 +173,6 @@ if (typeof tocbot !== 'undefined') {
     });
 }
 <?php endif; ?>
-<?php if($this->is('post')): ?>
-var _sharerEl = document.getElementById("post-bottom-bar");
-if (_sharerEl && typeof Headroom !== 'undefined') {
-    (new Headroom(_sharerEl, {
-        tolerance: 0,
-        offset: 70,
-        classes: { initial: "animated", pinned: "pinned", unpinned: "unpinned" }
-    })).init();
-}
-<?php endif; ?>
 var _hdrEl = document.getElementById("header");
 if (_hdrEl && typeof Headroom !== 'undefined') {
     (new Headroom(_hdrEl, {

@@ -65,38 +65,6 @@
         }
     };
 
-    /* ─── Reading progress bar ────────────────────────────────────── */
-
-    var Progress = {
-        el: null,
-        init: function () {
-            var post = document.getElementById('post-content');
-            if (!post) return;
-            var bar = document.createElement('div');
-            bar.id = 'read-progress';
-            bar.setAttribute('role', 'progressbar');
-            bar.setAttribute('aria-valuemin', '0');
-            bar.setAttribute('aria-valuemax', '100');
-            bar.setAttribute('aria-valuenow', '0');
-            bar.setAttribute('aria-label', '阅读进度');
-            document.body.appendChild(bar);
-            Progress.el = bar;
-            window.addEventListener('scroll', Progress.update, { passive: true });
-            Progress.update();
-        },
-        update: function () {
-            if (!Progress.el) return;
-            var post = document.getElementById('post-content');
-            if (!post) return;
-            var top = post.getBoundingClientRect().top + window.pageYOffset;
-            var bottom = post.getBoundingClientRect().bottom + window.pageYOffset;
-            var total = bottom - top - window.innerHeight;
-            var pct = total <= 0 ? 100 : Math.min(100, Math.max(0, Math.round((window.pageYOffset - top) / total * 100)));
-            Progress.el.style.width = pct + '%';
-            Progress.el.setAttribute('aria-valuenow', pct);
-        }
-    };
-
     /* ─── Back to top ─────────────────────────────────────────────── */
 
     var BackTop = {
@@ -229,7 +197,6 @@
         // Post-specific features (guarded by presence of post-content)
         var isPost = !!document.getElementById('post-content');
         if (isPost) {
-            Progress.init();
             initReadingTime();
             initCodeCopy();
             initMobileToc();

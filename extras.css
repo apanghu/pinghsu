@@ -210,20 +210,6 @@
 }
 #dm-toggle:hover { background: rgba(128,128,128,.15); }
 
-/* ─── Reading progress bar ─────────────────────────────────────────────── */
-
-#read-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 3px;
-    width: 0;
-    background: var(--ph-accent, #eb5055);
-    z-index: 9999;
-    transition: width .1s linear;
-    pointer-events: none;
-}
-
 /* ─── Back to top ───────────────────────────────────────────────────────── */
 
 #back-top {

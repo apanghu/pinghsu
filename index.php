@@ -20,9 +20,7 @@ $this->need('header.php');
 			<?php if ($this->options->postListSwitch == 'threeList'): ?>
 			<div class="post-list-item">
 				<div class="post-list-item-container">
-					<a href="<?php $this->permalink() ?>" class="item-thumb-link" aria-hidden="true" tabindex="-1">
-						<div class="item-thumb <?php echo $bgClass; ?>" style="background-image:url(<?php echo htmlspecialchars(postThumbUrl($this), ENT_QUOTES, 'UTF-8'); ?>);"></div>
-					</a>
+					<div class="item-thumb <?php echo $bgClass; ?>" style="background-image:url(<?php echo htmlspecialchars(postThumbUrl($this), ENT_QUOTES, 'UTF-8'); ?>);"></div>
 					<a href="<?php $this->permalink() ?>">
 	                	<div class="item-desc">
 							<p><?php $this->excerpt(80, '...');?></p>

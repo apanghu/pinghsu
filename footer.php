@@ -1,5 +1,7 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 
+</main><!-- /#main-content -->
+
 <footer id="footer" class="footer <?php if (isset($this->fields->archive)): ?>bg-white<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'defaultColor')): ?>bg-white<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'customColor')): ?>bg-grey<?php elseif($this->is('single')): ?>bg-white<?php endif; ?>">
     <div class="footer-social">
         <div class="footer-container clearfix">
@@ -56,7 +58,7 @@
 <div id="directory-content" class="directory-content">
     <nav class="toc js-toc"></nav>
 </div>
-<script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tocbot/4.18.2/tocbot.min.js"></script>
+<script src="<?php $this->options->themeUrl('vendor/tocbot.min.js'); ?>"></script>
 <?php endif; ?>
 <?php if(($this->is('single')) && ($this->allow('comment'))): ?>
 <script>
@@ -138,63 +140,57 @@ addCommentInputValue();
 </script>
 <?php endif; ?>
 <?php $this->footer(); ?>
-<script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/headroom/0.12.0/headroom.min.js"></script>
+<script src="<?php $this->options->themeUrl('vendor/headroom.min.js'); ?>"></script>
 <?php if ($this->options->useHighline == 'able'): ?>
-<script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
+<script src="<?php $this->options->themeUrl('vendor/highlight.min.js'); ?>"></script>
 <?php endif; ?>
 <?php if ($this->options->pjaxSet == 'able'): ?>
-<script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/instantclick/3.1.0/instantclick.min.js"></script>
+<script src="<?php $this->options->themeUrl('vendor/instantclick.min.js'); ?>"></script>
 <?php endif; ?>
 <?php if ($this->options->fastClickSet == 'able'): ?>
-<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/fastclick/1.0.6/fastclick.min.js"></script>
+<script src="<?php $this->options->themeUrl('vendor/fastclick.min.js'); ?>"></script>
 <?php endif; ?>
 <script>
 <?php if (($this->options->tableOfContents == 'able') && ($this->is('post'))): ?>
-var postDirectory = new Headroom(document.getElementById("directory-content"), {
-    tolerance: 0,
-    <?php if ($this->options->postshowthumb == 'able'): ?>
-    offset : 280,<?php else: ?>
-    offset : 90,<?php endif; ?>
-    classes: {
-        initial: "initial",
-        pinned: "pinned",
-        unpinned: "unpinned"
-    }
-});
-postDirectory.init();
-tocbot.init({
-    tocSelector: '.toc',
-    contentSelector: '.post-content',
-    headingSelector: 'h1, h2, h3, h4, h5',
-    collapseDepth: 2,
-    scrollSmooth: true,
-    scrollSmoothDuration: 600,
-    scrollSmoothOffset: -80,
-    headingsOffset: 80,
-});
+var _dirEl = document.getElementById("directory-content");
+if (_dirEl && typeof Headroom !== 'undefined') {
+    (new Headroom(_dirEl, {
+        tolerance: 0,
+        offset: <?php echo $this->options->postshowthumb == 'able' ? 280 : 90; ?>,
+        classes: { initial: "initial", pinned: "pinned", unpinned: "unpinned" }
+    })).init();
+}
+if (typeof tocbot !== 'undefined') {
+    tocbot.init({
+        tocSelector: '.toc',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        collapseDepth: 2,
+        scrollSmooth: true,
+        scrollSmoothDuration: 600,
+        scrollSmoothOffset: -80,
+        headingsOffset: 80,
+    });
+}
 <?php endif; ?>
 <?php if($this->is('post')): ?>
-var postSharer = new Headroom(document.getElementById("post-bottom-bar"), {
-    tolerance: 0,
-    offset : 70,
-    classes: {
-        initial: "animated",
-        pinned: "pinned",
-        unpinned: "unpinned"
-    }
-});
-postSharer.init();
+var _sharerEl = document.getElementById("post-bottom-bar");
+if (_sharerEl && typeof Headroom !== 'undefined') {
+    (new Headroom(_sharerEl, {
+        tolerance: 0,
+        offset: 70,
+        classes: { initial: "animated", pinned: "pinned", unpinned: "unpinned" }
+    })).init();
+}
 <?php endif; ?>
-var header = new Headroom(document.getElementById("header"), {
-    tolerance: 0,
-    offset : 70,
-    classes: {
-      initial: "animated",
-      pinned: "slideDown",
-      unpinned: "slideUp"
-    }
-});
-header.init();
+var _hdrEl = document.getElementById("header");
+if (_hdrEl && typeof Headroom !== 'undefined') {
+    (new Headroom(_hdrEl, {
+        tolerance: 0,
+        offset: 70,
+        classes: { initial: "animated", pinned: "slideDown", unpinned: "slideUp" }
+    })).init();
+}
 <?php if (($this->options->pjaxSet == 'disable') && ($this->options->useHighline == 'able') && ($this->is('post'))): ?>
 hljs.highlightAll();
 <?php endif; ?>
@@ -226,7 +222,7 @@ MathJax.Hub.Config({
 });
 MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 </script>
-<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" crossorigin="anonymous"></script>
 <?php endif; ?>
 <?php if($this->options->GoogleAnalytics): ?>
 <?php $this->options->GoogleAnalytics(); ?>

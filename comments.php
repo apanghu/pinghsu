@@ -47,7 +47,7 @@ $comments->alt(' comment-odd', ' comment-even');
         ?>
         <div class="comment-view" onclick="">
             <div class="comment-header">
-                <img class="avatar" src="<?php echo $avatar ?>" width="<?php echo $size ?>" height="<?php echo $size ?>" />
+                <img class="avatar" src="<?php echo $avatar ?>" width="<?php echo $size ?>" height="<?php echo $size ?>" alt="<?php echo htmlspecialchars($comments->author, ENT_QUOTES, 'UTF-8'); ?> 的头像" loading="lazy">
                 <span class="comment-author<?php echo $commentClass; ?>"><?php echo $author; ?></span>
             </div>
             <div class="comment-content">

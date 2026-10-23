@@ -23,9 +23,9 @@
 
 <article class="main-content <?php if ($this->options->postshowthumb == 'able'): ?>post-page<?php else: ?>page-page<?php endif; ?>" itemscope itemtype="https://schema.org/Article">
 	<div class="post-header">
-		<div class="post-title" itemprop="name headline">
+		<h1 class="post-title" itemprop="name headline">
 			<?php $this->title() ?>
-		</div>
+		</h1>
 		<div class="post-data">
 			<time datetime="<?php $this->date('c'); ?>" itemprop="datePublished">Published on <?php $this->date('M j, Y'); ?></time> in <?php $this->category(''); ?> with <a href="#comments"><?php $this->commentsNum(_t(' 0 comment'), _t(' 1 comment'), _t(' %d comments')); ?></a>
 		</div>

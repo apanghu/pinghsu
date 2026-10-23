@@ -3,7 +3,7 @@
 
 <div class="main-content common-page clearfix">
     <div class="common-item">
-        <div class="common-title">
+        <h1 class="common-title">
             <?php $this->archiveTitle(array(
 		        'category'  =>  _t('Category : %s'),
 		        'search'    =>  _t('Search : %s'),
@@ -11,7 +11,7 @@
 		        'author'    =>  _t('Author : %s'),
 		        'date'      =>  _t('Date : %s')
 		    ), '', ''); ?>
-        </div>
+        </h1>
         <div class="post-lists">
 			<div class="post-lists-body">
 				<?php if ($this->have()): ?>

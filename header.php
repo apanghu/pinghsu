@@ -69,10 +69,7 @@
             </form>
         </div>
         <?php endif;?>
-        <?php if ($this->options->darkMode == 'able'): ?>
-        <button id="dm-toggle" type="button" aria-label="切换为深色模式" title="深色"><span class="dm-icon" aria-hidden="true">🌙</span></button>
-        <?php endif; ?>
-        <nav class="navbar-mobile-menu" aria-label="移动端导航">
+<nav class="navbar-mobile-menu" aria-label="移动端导航">
             <span class="icon-menu cross" aria-hidden="true"><span class="middle"></span></span>
             <ul>
 			    <?php if ($this->options->categoryNav == 'able'): ?>

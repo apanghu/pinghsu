@@ -1,3 +1,73 @@
+# Pinghsu Theme · Typecho 1.3 / PHP 8 edition
+
+> **This is a fork of [chakhsu/pinghsu](https://github.com/chakhsu/pinghsu).**
+> The design and nearly all of the code are the work of the original author, [Chakhsu Lau](https://github.com/chakhsu) (demo: [linpx.com](https://www.linpx.com)).
+> This repository keeps the original **MIT license** and copyright notice (see [LICENSE.md](LICENSE.md)) and only adds the changes listed below. If you want the theme as the author made it, use the [original repository](https://github.com/chakhsu/pinghsu).
+
+[简体中文](README.md)
+
+## What this fork changes
+
+The original was tested on PHP 7.0. On Typecho 1.3 + PHP 8.2 it prints `Deprecated` / `Warning` messages into the page (the footer of every page, the share bar and the previous/next links of post pages). This fork fixes them and adds two page templates.
+
+### 1. Typecho 1.3 / PHP 8.2 compatibility
+
+| File | Problem | Fix |
+|---|---|---|
+| `functions.php` → `getHotTags()` | Footer tag cloud. Since Typecho 1.2 `filter()` no longer returns `permalink`, and the tag rows were passed to the post widget: `Undefined array key "created"` / `"permalink"`, once per tag | Build the tag link with `\Typecho\Router::url('tag', …)` |
+| `functions.php` → `theNext()` / `thePrev()` | Previous/next post links: same missing `permalink` | Use the core `\Widget\Contents\From` widget, which provides the permalink |
+| `post.php` | Share buttons used `urlencode($this->permalink())` / `urlencode($this->title())`. Those methods echo and return `null`: PHP 8.1+ deprecation, and the share URLs were broken | Read the properties `$this->permalink` / `$this->title` |
+| `comments.php` | (not a compatibility fix) outputs reCAPTCHA v3 after the comment form | Guarded with `class_exists('reCAPTCHAv3_Plugin')`, no effect without the plugin |
+
+### 2. Two new page templates
+
+| Page | File | Notes |
+|---|---|---|
+| Friend links | `page-links.php` | Responsive card grid (3 / 2 / 1 columns): coloured initial avatars (real image only when one is set), name, description, host; below it a "this site" box with copy buttons and apply instructions; the comment area stays for link requests. Reads the `links` table of the Links plugin (`state = 1`, ordered by `order`), and says so when the plugin is not enabled |
+| About | `page-about.php` | Logo / title / description / ICP number, live stats (posts / categories / tags / days running), an intro card, navigation cards and an optional license panel |
+| Shared | `pages.css`, `pages.js` | All styles are scoped under `.pg`, other theme pages are untouched. The script does click-to-copy and the number count-up. No external libraries or fonts, honours `prefers-reduced-motion` |
+
+| Friend links | About |
+|:--|:--|
+| ![Friend links page](./doc/page-links.png) | ![About page](./doc/page-about.png) |
+
+(Site name, friends, e-mail etc. in the screenshots are placeholders.)
+
+### Changed files
+
+| File | Status |
+|---|---|
+| `functions.php` | modified (`getHotTags`, `theNext`, `thePrev`) |
+| `post.php` | modified (4 share links) |
+| `comments.php` | modified (1 line, optional reCAPTCHA) |
+| `page-links.php`, `page-about.php`, `pages.css`, `pages.js` | **new** |
+| `doc/page-links.png`, `doc/page-about.png` | **new** (screenshots) |
+| `README.md`, `README_en.md` | modified (this notice on top, the original text below) |
+
+Everything else is identical to upstream v1.6.2 (latest upstream commit `ed2e5f5`).
+
+### Using the new pages
+
+1. Copy the files over `usr/themes/pinghsu/`, same as installing the original.
+2. In the admin: create a page and pick **Template Page of Links** or **Template Page of About** as its custom template.
+3. **Links page** needs the Links plugin installed and enabled (it creates the `links` table; the page reads `name`, `url`, `description`, `image`, `state`, `order`). Manage friends in the plugin's admin page. A link without an image shows a coloured initial; image URLs containing `gravatar` are treated as placeholders and ignored.
+4. **About page**: write the page body in Markdown. Everything **before** the first `---` goes into the "about" card, everything **after** it into the license panel (the panel is hidden when there is nothing after it). Title, description, logo (theme setting `logoUrl`) and ICP number (theme setting `ICPRecordNumber`) are read automatically. Navigation cards appear only when their target exists: the archive page (a page using `page-timeline.php`), the links page, RSS and the sitemap (needs the Sitemap plugin). Inside the body, `<code class="pg-mail" data-copy="name#example.com" data-at tabindex="0" role="button">name#example.com</code>` copies an address on click, turning `#` into `@`.
+
+### Compatibility and limits
+
+- **Tested only on Typecho 1.3.0 with PHP 8.2.** The changes use the namespaced APIs of newer Typecho (`\Typecho\Router`, `\Widget\Options`, `\Widget\Contents\From`, `\Utils\Markdown`); older versions were not tested, use the original theme there.
+- Outside the theme, many older plugins have similar problems on Typecho 1.3 / PHP 8 (e.g. markdown editor plugins calling `markdown()` / `autoP()`, which became `protected`). They are out of scope for this repository.
+- The page copy is Chinese; there is no i18n.
+
+### Credits
+
+- Original theme: [chakhsu/pinghsu](https://github.com/chakhsu/pinghsu) by **Chakhsu Lau**, MIT license.
+- The changes in this fork are released under the MIT license as well.
+
+---
+
+# Original README
+
 ## Pinghsu Theme
 
 [简体中文](README.md)

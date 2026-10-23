@@ -1,3 +1,76 @@
+# Pinghsu Theme · Typecho 1.3 / PHP 8 适配版
+
+> **这是 [chakhsu/pinghsu](https://github.com/chakhsu/pinghsu) 的 fork。**
+> 主题的设计与绝大部分代码出自原作者 [Chakhsu Lau](https://github.com/chakhsu)（主题预览：[linpx.com](https://www.linpx.com)）。
+> 本仓库沿用原作者的 **MIT 协议**并保留其版权声明（见 [LICENSE.md](LICENSE.md)）；只是在原版基础上做了下面列出的改动。想要原汁原味的主题，请直接使用[原仓库](https://github.com/chakhsu/pinghsu)。
+
+[English](README_en.md)
+
+## 本分支改了什么
+
+原版在 PHP 7.0 下测试，放到 Typecho 1.3 + PHP 8.2 上会在页面里打印一堆 `Deprecated` / `Warning`（每个页面的页脚、文章页的分享栏和上一篇/下一篇都会出现）。这个分支修掉了这些问题，并新增了两个页面模板。
+
+### 一、兼容 Typecho 1.3 / PHP 8.2
+
+| 文件 | 问题 | 改法 |
+|---|---|---|
+| `functions.php` → `getHotTags()` | 页脚“热门标签”。Typecho 1.2+ 的 `filter()` 不再返回 `permalink`，且这里把标签行交给了文章组件，报 `Undefined array key "created"` / `"permalink"`（每个标签一次，页面上刷一排） | 直接用 `\Typecho\Router::url('tag', …)` 生成标签链接 |
+| `functions.php` → `theNext()` / `thePrev()` | 文章页“上一篇/下一篇”同样拿不到 `permalink` | 改用核心的 `\Widget\Contents\From` 组件取文章，由它给出固定链接 |
+| `post.php` | 分享按钮里的 `urlencode($this->permalink())`、`urlencode($this->title())`：这两个方法是直接输出、返回 `null` 的，PHP 8.1+ 报 `urlencode(): Passing null` 弃用，分享链接本身也是坏的 | 改为读属性 `$this->permalink` / `$this->title` |
+| `comments.php` | （不是兼容性修复）在评论表单后新增 reCAPTCHA v3 的输出 | 先用 `class_exists('reCAPTCHAv3_Plugin')` 判断，没装插件不受影响 |
+
+### 二、新增两个页面模板
+
+| 页面 | 文件 | 说明 |
+|---|---|---|
+| 友情链接 | `page-links.php` | 卡片网格（三列 / 两列 / 单列自适应）：彩色首字头像（有真实头像才用图片）、名称、简介、域名；下方是“本站信息”（一键复制）和“如何申请”；评论区保留，可继续用来收友链申请。数据读取 [Links 友情链接插件](#使用新页面)的 `links` 表（`state = 1`，按 `order` 排序），没启用插件时会给出提示 |
+| 关于 | `page-about.php` | 站点 logo / 名称 / 简介 / 备案号、实时统计（文章 / 分类 / 标签 / 运行天数）、“关于本站”介绍、站点导航卡片、可选的“版权声明”区域 |
+| 共用 | `pages.css`、`pages.js` | 样式全部限定在 `.pg` 下，不影响主题其他页面；脚本负责点击复制和数字动画。不依赖任何外部库或字体，尊重 `prefers-reduced-motion` |
+
+| 友情链接 | 关于 |
+|:--|:--|
+| ![友情链接页](./doc/page-links.png) | ![关于页](./doc/page-about.png) |
+
+（截图里的站名、友链、邮箱等都是占位内容。）
+
+### 变更文件一览
+
+| 文件 | 状态 |
+|---|---|
+| `functions.php` | 修改（`getHotTags`、`theNext`、`thePrev`） |
+| `post.php` | 修改（分享按钮 4 处） |
+| `comments.php` | 修改（新增 1 行，可选的 reCAPTCHA） |
+| `page-links.php` | **新增** |
+| `page-about.php` | **新增** |
+| `pages.css` | **新增** |
+| `pages.js` | **新增** |
+| `doc/page-links.png`、`doc/page-about.png` | **新增**（截图） |
+| `README.md`、`README_en.md` | 修改（顶部加入本说明，原文保留在下方） |
+
+其余文件与原版 v1.6.2（上游最新提交 `ed2e5f5`）完全一致。
+
+### 使用新页面
+
+1. 把仓库里的文件覆盖到 `usr/themes/pinghsu/`（和原版安装方式相同）。
+2. 后台「独立页面」→ 新建页面，在右侧“自定义模板”里选 **Template Page of Links**（友情链接）或 **Template Page of About**（关于）。
+3. **友情链接页**：需要安装并启用 Links 友情链接插件（该插件在数据库里建 `links` 表，页面读取其中的 `name`、`url`、`description`、`image`、`state`、`order` 字段）。在插件的管理页里增删友链即可，页面自动更新。头像为空时显示首字色块；头像地址里含 `gravatar` 的会被当作占位图而忽略。
+4. **关于页**：页面正文用 Markdown 写。第一个 `---`（水平线）**之前**的内容显示在“关于本站”卡片里，**之后**的内容显示在“版权声明”区域（不写就不显示这个区域）。站名、站点描述、logo（外观设置里的 `logoUrl`）、备案号（外观设置里的 `ICPRecordNumber`）自动读取；导航卡片会按实际情况出现：归档页（使用 `page-timeline.php` 模板的页面）、友链页、RSS、网站地图（需启用 Sitemap 插件）。正文里的 `<code class="pg-mail" data-copy="name#example.com" data-at tabindex="0" role="button">name#example.com</code>` 点击后会复制邮箱，并把 `#` 换成 `@`。
+
+### 兼容性与已知限制
+
+- **只在 Typecho 1.3.0 + PHP 8.2 下测试过。** 改动用到了 Typecho 1.2 以后的命名空间 API（`\Typecho\Router`、`\Widget\Options`、`\Widget\Contents\From`、`\Utils\Markdown`），更旧的版本没有测试，需要的话请使用原版。
+- 主题之外，不少旧插件在 Typecho 1.3 / PHP 8 下也有同类问题（例如 Markdown 编辑器插件调用了已经变成 `protected` 的 `markdown()` / `autoP()`），那些不在本仓库的范围内。
+- 页面文案是中文，没有做多语言。
+
+### 致谢
+
+- 原主题：[chakhsu/pinghsu](https://github.com/chakhsu/pinghsu)，作者 **Chakhsu Lau**，MIT 协议。
+- 本分支的改动同样以 MIT 协议发布。
+
+---
+
+# 以下为原版 README
+
 ## Pinghsu Theme
 
 [English](README_en.md)

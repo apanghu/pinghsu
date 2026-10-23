@@ -13,6 +13,30 @@ $this->need('header.php');
 ?>
 
 <div class="main-content index-page clearfix <?php if ($this->options->postListSwitch == 'oneList'): ?>onelist-page<?php endif; ?>">
+
+<?php
+$bioBio = $this->options->description
+    ?: '从全栈工程师转型 AI 应用开发，专注于把模型能力做成真正有人使用的产品。在产品、工程和人机协作的交叉处工作。';
+?>
+<div class="site-bio">
+    <p class="site-bio-handle">@<?php echo htmlspecialchars($this->options->title, ENT_QUOTES, 'UTF-8'); ?></p>
+    <p class="site-bio-text" data-typetext="<?php echo htmlspecialchars($bioBio, ENT_QUOTES, 'UTF-8'); ?>"></p>
+</div>
+<script>
+(function(){
+    var el = document.querySelector('.site-bio-text[data-typetext]');
+    if (!el) return;
+    var text = el.getAttribute('data-typetext');
+    el.textContent = '';
+    var i = 0;
+    function tick() {
+        el.textContent = text.slice(0, ++i);
+        if (i < text.length) requestAnimationFrame(function(){ setTimeout(tick, 28); });
+        else el.classList.add('typed');
+    }
+    setTimeout(tick, 300);
+}());
+</script>
 	<div class="post-lists">
 		<div class="post-lists-body">
 		<?php while($this->next()): ?>

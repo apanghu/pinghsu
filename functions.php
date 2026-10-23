@@ -206,7 +206,8 @@ function postThumbUrl($obj) {
     }
 
     if ($thumb === '') {
-        $attach = $obj->attachments(1)->attachment;
+        $attachWidget = $obj->attachments(1);
+        $attach = $attachWidget ? $attachWidget->attachment : null;
         if (isset($attach->isImage) && $attach->isImage == 1) {
             $thumb = $attach->url;
         }

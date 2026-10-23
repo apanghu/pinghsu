@@ -118,7 +118,7 @@
     letter-spacing: .02em;
 }
 
-/* Pagination: subtle style lift */
+/* Pagination */
 .lists-navigator {
     text-align: center;
     margin: 24px 0 16px;
@@ -131,9 +131,23 @@
     border-radius: 4px;
     transition: background .15s, color .15s;
 }
+/* Default: muted text */
+.lists-navigator a {
+    color: var(--ph-text, #767676) !important;
+}
+/* Hover: red background + white text */
 .lists-navigator a:hover {
-    background: var(--ph-accent, #eb5055);
-    color: #fff;
+    background: var(--ph-accent, #eb5055) !important;
+    color: #fff !important;
+}
+/* Current page li > a: red text → white on hover */
+.lists-navigator .current a {
+    color: var(--ph-accent, #eb5055) !important;
+    font-weight: 600;
+}
+.lists-navigator .current a:hover {
+    background: var(--ph-accent, #eb5055) !important;
+    color: #fff !important;
 }
 
 /* ─── Dark mode ─────────────────────────────────────────────────────────── */
@@ -443,3 +457,55 @@ pre:hover .code-copy-btn { opacity: 1; }
     color: var(--ph-accent, #eb5055);
 }
 
+
+/* ─── Site bio strip (homepage top) ────────────────────────────────────── */
+
+.site-bio {
+    padding: 0 0 44px;
+    margin-bottom: 8px;
+}
+
+.site-bio-handle {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 22px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ph-accent, #eb5055);
+    letter-spacing: .06em;
+}
+.site-bio-handle::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ph-border, #e8e8e8);
+}
+
+/* Bio text: large + typewriter cursor while typing */
+.site-bio-text {
+    font-size: 21px;
+    line-height: 1.8;
+    font-weight: 300;
+    color: var(--ph-text-dark, #313131);
+    margin: 0;
+    max-width: 680px;
+    letter-spacing: .01em;
+    min-height: 1.8em;
+}
+.site-bio-text:not(.typed)::after {
+    content: '|';
+    color: var(--ph-accent, #eb5055);
+    font-weight: 400;
+    animation: bio-blink .8s step-start infinite;
+    margin-left: 1px;
+}
+@keyframes bio-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+@media (max-width: 640px) {
+    .site-bio { padding-bottom: 32px; }
+    .site-bio-text { font-size: 17px; }
+}

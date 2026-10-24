@@ -28,7 +28,7 @@
     <?php endif; ?>
     <link href="<?php $this->options->themeUrl('style.min.css'); ?>?v=<?php echo filemtime(__DIR__ . '/style.min.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('extras.css'); ?>?v=<?php echo filemtime(__DIR__ . '/extras.css'); ?>" rel="stylesheet">
-    <script>(function(){var s=null;try{s=localStorage.getItem('ph-theme');}catch(e){}if(s==='dark'||s==='light'){document.documentElement.setAttribute('data-theme',s);}var el=document.getElementById('hljs-dark-theme');if(el){var d=s==='dark'||(s!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);el.media=d?'all':'not all';}}());</script>
+    <script>(function(){var s=null;try{s=localStorage.getItem('ph-theme');}catch(e){}if(s!=='dark')s='light';document.documentElement.setAttribute('data-theme',s);var el=document.getElementById('hljs-dark-theme');if(el){el.media=s==='dark'?'all':'not all';}}());</script>
 </head>
 <body class="<?php if (isset($this->fields->archive)): ?>bg-grey<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'defaultColor')): ?>bg-grey<?php elseif($this->is('archive')&&($this->options->colorBgPosts == 'customColor')): ?>bg-white<?php elseif(!$this->is('single')): ?>bg-grey<?php endif; ?>">
 <a class="skip-link sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
